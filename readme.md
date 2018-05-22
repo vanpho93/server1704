@@ -10,8 +10,8 @@ show - can update
 them √
 xoa - update tinh nang xoa tat ca comment kem theo
 sua √
-like 
-dislike
+like √
+dislike √
 
 COMMENT
 

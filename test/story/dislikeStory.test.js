@@ -5,7 +5,7 @@ const { Story } = require('../../src/models/story.model');
 const { UserService } = require('../../src/services/user.service');
 const { StoryService } = require('../../src/services/story.service');
 
-describe('POST /story/like/:idStory', () => {
+describe('POST /story/dislike/:idStory', () => {
     let token1, idUser1, token2, idUser2, idStory;
 
     beforeEach('Create user for test', async () => {
@@ -17,71 +17,67 @@ describe('POST /story/like/:idStory', () => {
         idUser2 = user2._id;
         const story = await StoryService.createStory(idUser1, 'ABCD');
         idStory = story._id;
+        await StoryService.likeStory(idUser2, idStory);
     });
 
-    it('Can like a story', async () => {
+    it('Can dislike a story', async () => {
         const response = await request(app)
-        .post('/story/like/' + idStory)
+        .post('/story/dislike/' + idStory)
         .set({ token: token2 });
         const { success, message, story } = response.body;
         equal(success, true);
         equal(message, undefined);
-        equal(story.fans[0], idUser2);
+        equal(story.fans.length, 0);
         const storyDb = await Story.findById(idStory).populate('fans');
-        equal(storyDb.fans[0].name, 'Ti Nguyen');
+        equal(storyDb.fans.length, 0);
     });
 
-    it('Cannot like a story with invalid id', async () => {
+    it('Cannot dislike a story with invalid id', async () => {
         const response = await request(app)
-        .post('/story/like/123')
+        .post('/story/dislike/123')
         .set({ token: token2 });
         const { success, message, story } = response.body;
-        equal(response.status, 400);
         equal(success, false);
         equal(message, 'INVALID_ID');
         equal(story, undefined);
-        const storyDb = await Story.findById(idStory);
-        equal(storyDb.fans.length, 0);
+        const storyDb = await Story.findById(idStory).populate('fans');
+        equal(storyDb.fans[0]._id.toString(), idUser2);
     });
 
-    it('Cannot like a story with invalid token', async () => {
+    it('Cannot dislike a story with invalid token', async () => {
         const response = await request(app)
-        .post('/story/like/' + idStory)
+        .post('/story/dislike/' + idStory)
         .set({ token: 'a.b.c' });
         const { success, message, story } = response.body;
-        equal(response.status, 400);
         equal(success, false);
         equal(message, 'INVALID_TOKEN');
         equal(story, undefined);
-        const storyDb = await Story.findById(idStory);
-        equal(storyDb.fans.length, 0);
+        const storyDb = await Story.findById(idStory).populate('fans');
+        equal(storyDb.fans[0]._id.toString(), idUser2);
     });
 
-    it('Cannot like a removed story', async () => {
-        await StoryService.removeStory(idUser1, idStory);
+    it('Cannot dislike a story with token1', async () => {
         const response = await request(app)
-        .post('/story/like/' + idStory)
-        .set({ token: token2 });
+        .post('/story/dislike/' + idStory)
+        .set({ token: token1 });
         const { success, message, story } = response.body;
-        equal(response.status, 404);
-        equal(success, false);
-        equal(message, 'CANNOT_FIND_STORY');
-        equal(story, undefined);
-        const storyDb = await Story.findById(idStory);
-        equal(storyDb, null);
-    });
-
-    it('Cannot like a story twice', async () => {
-        await StoryService.likeStory(idUser2, idStory);
-        const response = await request(app)
-        .post('/story/like/' + idStory)
-        .set({ token: token2 });
-        const { success, message, story } = response.body;
-        equal(response.status, 404);
         equal(success, false);
         equal(message, 'CANNOT_FIND_STORY');
         equal(story, undefined);
         const storyDb = await Story.findById(idStory).populate('fans');
         equal(storyDb.fans[0]._id.toString(), idUser2);
+    });
+
+    it('Cannot dislike a removed story', async () => {
+        await StoryService.removeStory(idUser1, idStory);
+        const response = await request(app)
+        .post('/story/dislike/' + idStory)
+        .set({ token: token2 });
+        const { success, message, story } = response.body;
+        equal(success, false);
+        equal(message, 'CANNOT_FIND_STORY');
+        equal(story, undefined);
+        const storyDb = await Story.findById(idStory).populate('fans');
+        equal(storyDb, null);
     });
 });
