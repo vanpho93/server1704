@@ -6,7 +6,9 @@ const { checkObjectId } = require('../helpers/checkObjectIds');
 
 class StoryService {
     static async getAllStories() {
-        return Story.find({}).populate('author', 'name');
+        return Story.find({})
+            .populate('author', 'name')
+            .populate('fans', 'name');
     }
 
     static async createStory(idUser, content) {
@@ -30,6 +32,24 @@ class StoryService {
         const story = await Story.findOneAndRemove({ _id: idStory, author: idUser });
         if (!story) throw new ServerError('CANNOT_FIND_STORY', 404);
         await User.findByIdAndUpdate(idUser, { $pull: { stories: idStory } })
+        return story;
+    }
+
+    static async likeStory(idUser, idStory) {
+        checkObjectId(idStory);
+        const queryObject = { _id: idStory, fans: { $ne: idUser } };
+        const updateObject = { $push: { fans: idUser } };
+        const story = await Story.findOneAndUpdate(queryObject, updateObject, { new: true });
+        if (!story) throw new ServerError('CANNOT_FIND_STORY', 404);
+        return story;
+    }
+
+    static async dislikeStory(idUser, idStory) {
+        checkObjectId(idStory);
+        const queryObject = { _id: idStory, fans: idUser };
+        const updateObject = { $pull: { fans: idUser } };
+        const story = await Story.findOneAndUpdate(queryObject, updateObject, { new: true });
+        if (!story) throw new ServerError('CANNOT_FIND_STORY', 404);
         return story;
     }
 }

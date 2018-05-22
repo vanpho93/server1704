@@ -31,4 +31,16 @@ storyRouter.delete('/:idStory', (req, res) => {
     .catch(res.onError);
 });
 
+storyRouter.post('/like/:idStory', (req, res) => {
+    StoryService.likeStory(req.idUser, req.params.idStory)
+    .then(story => res.send({ success: true, story }))
+    .catch(res.onError);
+});
+
+storyRouter.post('/dislike/:idStory', (req, res) => {
+    StoryService.dislikeStory(req.idUser, req.params.idStory)
+    .then(story => res.send({ success: true, story }))
+    .catch(res.onError);
+});
+
 module.exports = { storyRouter };
