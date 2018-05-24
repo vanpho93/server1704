@@ -7,7 +7,7 @@ const { UserService } = require('../../src/services/user.service');
 const { StoryService } = require('../../src/services/story.service');
 const { CommentService } = require('../../src/services/comment.service');
 
-describe('PUT /comment/:id', () => {
+describe('DELETE /comment/:id', () => {
     let token1, idUser1, token2, idUser2, idStory, idComment;
 
     beforeEach('Create user for test', async () => {
@@ -23,38 +23,22 @@ describe('PUT /comment/:id', () => {
         idComment = comment._id;
     });
 
-    it('Can update comment', async () => {
+    it('Can delete comment', async () => {
         const response = await request(app)
-        .put('/comment/' + idComment)
-        .send({ content: 'RST' })
+        .delete('/comment/' + idComment)
         .set({ token: token2 });
         const { success, message, comment } = response.body;
         equal(success, true);
         equal(message, undefined);
-        equal(comment.content, 'RST');
+        equal(comment.content, 'XYZ');
         equal(comment.author, idUser2);
         const commentDb = await Comment.findById(idComment);
-        equal(commentDb.content, 'RST');
+        equal(commentDb, null);
     });
 
-    it('Cannot update comment with empty content', async () => {
+    it('Cannot remove comment with invalid id', async () => {
         const response = await request(app)
-        .put('/comment/' + idComment)
-        .send({ content: '' })
-        .set({ token: token2 });
-        const { success, message, comment } = response.body;
-        equal(response.status, 400);
-        equal(success, false);
-        equal(message, 'EMPTY_CONTENT');
-        equal(comment, undefined);
-        const commentDb = await Comment.findById(idComment);
-        equal(commentDb.content, 'XYZ');
-    });
-
-    it('Cannot update comment with invalid id', async () => {
-        const response = await request(app)
-        .put('/comment/123')
-        .send({ content: 'RSI' })
+        .delete('/comment/123')
         .set({ token: token2 });
         const { success, message, comment } = response.body;
         equal(response.status, 400);
@@ -65,10 +49,9 @@ describe('PUT /comment/:id', () => {
         equal(commentDb.content, 'XYZ');
     });
 
-    it('Cannot update comment with invalid token', async () => {
+    it('Cannot remove comment with invalid token', async () => {
         const response = await request(app)
-        .put('/comment/' + idComment)
-        .send({ content: 'RSI' })
+        .delete('/comment/' + idComment)
         .set({ token: 'a.b.c' });
         const { success, message, comment } = response.body;
         equal(response.status, 400);
@@ -79,10 +62,9 @@ describe('PUT /comment/:id', () => {
         equal(commentDb.content, 'XYZ');
     });
 
-    it('Cannot update comment without token', async () => {
+    it('Cannot remove comment without token', async () => {
         const response = await request(app)
-        .put('/comment/' + idComment)
-        .send({ content: 'RSI' })
+        .delete('/comment/' + idComment)
         .set({ token: '' });
         const { success, message, comment } = response.body;
         equal(response.status, 400);
@@ -93,10 +75,9 @@ describe('PUT /comment/:id', () => {
         equal(commentDb.content, 'XYZ');
     });
 
-    it('Cannot update comment with token1', async () => {
+    it('Cannot remove comment with token1', async () => {
         const response = await request(app)
-        .put('/comment/' + idComment)
-        .send({ content: 'RSI' })
+        .delete('/comment/' + idComment)
         .set({ token: token1 });
         const { success, message, comment } = response.body;
         equal(response.status, 404);
@@ -107,12 +88,11 @@ describe('PUT /comment/:id', () => {
         equal(commentDb.content, 'XYZ');
     });
 
-    it('Cannot update a removed comment', async () => {
+    it('Cannot remove a removed comment', async () => {
         await CommentService.removeComment(idUser2, idComment);
         const response = await request(app)
-        .put('/comment/' + idComment)
-        .send({ content: 'RSI' })
-        .set({ token: token1 });
+        .delete('/comment/' + idComment)
+        .set({ token: token2 });
         const { success, message, comment } = response.body;
         equal(response.status, 404);
         equal(success, false);
@@ -122,12 +102,11 @@ describe('PUT /comment/:id', () => {
         equal(commentDb, null);
     });
 
-    it.only('Cannot update comment a removed story', async () => {
+    it('Cannot remove comment of a removed story', async () => {
         await StoryService.removeStory(idUser1, idStory);
         const response = await request(app)
-        .put('/comment/' + idComment)
-        .send({ content: 'RSI' })
-        .set({ token: token1 });
+        .delete('/comment/' + idComment)
+        .set({ token: token2 });
         const { success, message, comment } = response.body;
         equal(response.status, 404);
         equal(success, false);

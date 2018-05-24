@@ -26,6 +26,14 @@ class CommentService {
         if (!comment) throw new ServerError('CANNOT_FIND_COMMENT', 404);
         return comment;
     }
+
+    static async removeComment(idUser, idComment) {
+        checkObjectId(idComment);
+        const comment = await Comment.findOneAndRemove({ _id: idComment, author: idUser });
+        if (!comment) throw new ServerError('CANNOT_FIND_COMMENT', 404);
+        await Story.findByIdAndUpdate(comment.story, { $pull: { comments: comment._id } });
+        return comment;
+    }
 }
 
 module.exports = { CommentService };

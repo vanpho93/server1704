@@ -15,9 +15,9 @@ dislike √
 
 COMMENT
 
-them
-xoa
-sua
+them √
+xoa √
+sua √
 
 FRIEND
 
