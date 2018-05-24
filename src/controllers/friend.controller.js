@@ -18,4 +18,22 @@ friendRouter.post('/cancel/:idOther', (req, res) => {
     .catch(res.onError);
 });
 
+friendRouter.post('/accept/:idOther', (req, res) => {
+    FriendService.acceptFriendRequest(req.idUser, req.params.idOther)
+    .then(user => res.send({ success: true, user }))
+    .catch(res.onError);
+});
+
+friendRouter.post('/decline/:idOther', (req, res) => {
+    FriendService.acceptFriendRequest(req.idUser, req.params.idOther)
+    .then(user => res.send({ success: true, user }))
+    .catch(res.onError);
+});
+
+friendRouter.delete('/:idOther', (req, res) => {
+    FriendService.declineFriendRequest(req.idUser, req.params.idOther)
+    .then(user => res.send({ success: true, user }))
+    .catch(res.onError);
+});
+
 module.exports = { friendRouter };
