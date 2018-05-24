@@ -6,6 +6,6 @@ const commentSchema = new mongoose.Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
-const Comment = mongoose.model('Comment', storySchema);
+const Comment = mongoose.model('Comment', commentSchema);
 
 module.exports = { Comment };

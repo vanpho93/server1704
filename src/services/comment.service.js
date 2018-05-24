@@ -6,7 +6,18 @@ const { verify } = require('../helpers/jwt');
 const { checkObjectId } = require('../helpers/checkObjectIds');
 
 class CommentService {
-    static async createComment(idUser, idStory, content) {}
+    static async createComment(idUser, idStory, content) {
+        checkObjectId(idStory);
+        if (!content) throw new ServerError('EMPTY_CONTENT', 400);
+        const comment = new Comment({ author: idUser, story: idStory, content });
+        await comment.save();
+        const story = await Story.findByIdAndUpdate(idStory, { $push: { comments: comment._id } });
+        if (!story) {
+            await Comment.findByIdAndRemove(comment._id);
+            throw new ServerError('CANNOT_FIND_STORY', 404);
+        }
+        return Comment.populate(comment, { path: 'author', select: 'name' });
+    }
 }
 
 module.exports = { CommentService };
