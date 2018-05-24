@@ -122,7 +122,7 @@ describe('PUT /comment/:id', () => {
         equal(commentDb, null);
     });
 
-    it.only('Cannot update comment a removed story', async () => {
+    it('Cannot update comment a removed story', async () => {
         await StoryService.removeStory(idUser1, idStory);
         const response = await request(app)
         .put('/comment/' + idComment)

@@ -8,7 +8,7 @@ STORY
 
 show - can update
 them √
-xoa - update tinh nang xoa tat ca comment kem theo
+xoa √
 sua √
 like √
 dislike √
