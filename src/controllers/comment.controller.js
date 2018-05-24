@@ -13,4 +13,11 @@ commentRouter.post('/', (req, res) => {
     .catch(res.onError);
 });
 
+commentRouter.put('/:_id', (req, res) => {
+    const { content } = req.body;
+    CommentService.updateComment(req.idUser, req.params._id, content)
+    .then(comment => res.send({ success: true, comment }))
+    .catch(res.onError);
+});
+
 module.exports = { commentRouter };

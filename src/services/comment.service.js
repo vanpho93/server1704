@@ -18,6 +18,14 @@ class CommentService {
         }
         return Comment.populate(comment, { path: 'author', select: 'name' });
     }
+
+    static async updateComment(idUser, idComment, content) {
+        checkObjectId(idComment);
+        if (!content) throw new ServerError('EMPTY_CONTENT', 400);
+        const comment = await Comment.findOneAndUpdate({ _id: idComment, author: idUser }, { content }, { new: true });
+        if (!comment) throw new ServerError('CANNOT_FIND_COMMENT', 404);
+        return comment;
+    }
 }
 
 module.exports = { CommentService };
