@@ -100,7 +100,7 @@ class FriendService {
         if (!other) throw new ServerError('CANNOT_FIND_USER', 404);
         return other;
     }
-    static async removeFriendRequest() {
+    static async removeFriendRequest(idUser, idOther) {
         checkObjectId(idOther);
         const queryObject1 = {
             _id: idUser,

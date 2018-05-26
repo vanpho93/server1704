@@ -21,7 +21,7 @@ describe('POST /friend/accept/:idOther', () => {
         await FriendService.sendFriendRequest(idUser1.toString(), idUser2.toString());
     });
 
-    it.only('Can cancel friend request', async () => {
+    it('Can accept friend request', async () => {
         const response = await request(app)
             .post('/friend/accept/' + idUser1)
             .set({ token: token2 });
