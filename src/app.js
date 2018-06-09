@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { json } = require('body-parser');
 
 const { storyRouter } = require('./controllers/story.controller');
@@ -10,6 +11,7 @@ const { onError } = require('./middlewares/onError.middleware');
 
 const app = express();
 app.use(json());
+app.use(cors());
 app.use(onError);
 
 app.use('/user', userRouter);
