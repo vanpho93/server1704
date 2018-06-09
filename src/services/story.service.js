@@ -9,7 +9,8 @@ class StoryService {
     static async getAllStories() {
         return Story.find({})
             .populate('author', 'name')
-            .populate('fans', 'name');
+            .populate('fans', 'name')
+            .sort({ _id: -1 });
     }
 
     static async createStory(idUser, content) {
