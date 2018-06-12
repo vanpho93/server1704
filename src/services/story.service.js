@@ -10,6 +10,7 @@ class StoryService {
         return Story.find({})
             .populate('author', 'name')
             .populate('fans', 'name')
+            .populate({ path: 'comments', populate: { path: 'author', select: 'name' } })
             .sort({ _id: -1 });
     }
 

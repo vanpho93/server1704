@@ -1,5 +1,6 @@
-const { User } = require('../models/user.model');
 const { hash, compare } = require('bcrypt');
+const faker = require('faker');
+const { User } = require('../models/user.model');
 const { sign, verify } = require('../helpers/jwt');
 const { ServerError } = require('../models/server-error.model');
 
@@ -44,5 +45,11 @@ class UserService {
         return UserService.getUserObject(user);
     }
 }
+
+// for(let i = 0; i < 15; i++) {
+//     const name = faker.name.firstName();
+//     const email = faker.internet.email(name);
+//     UserService.signUp(email, '123', name);
+// }
 
 module.exports = { UserService };
