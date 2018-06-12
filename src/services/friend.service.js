@@ -6,7 +6,7 @@ class FriendService {
     static async getPeople(idUser) {
         const { friends } = await User.findById(idUser, { friends: 1 }).populate('friends', 'name');
         const { sentRequests } = await User.findById(idUser, { sentRequests: 1 }).populate('sentRequests', 'name');
-        const { inCommingRequests } = await User.findById(idUser, { inCommingRequests: 1 }).populate('incommingRequests', 'name');
+        const { inCommingRequests } = await User.findById(idUser, { inCommingRequests: 1 }).populate('inCommingRequests', 'name');
         const knownUsers = friends.concat(sentRequests).concat(inCommingRequests);
         const _idKnownUsers = knownUsers.map(u => u._id).concat(idUser);
         const otherUsers = await User.find({ _id: { $nin: _idKnownUsers } }, { name: 1 })
